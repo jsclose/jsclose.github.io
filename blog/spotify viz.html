@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- ## for client-side less
+  <link rel="stylesheet/less" type="text/css" href="/theme/css/style.less">
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/less.js/1.7.3/less.min.js" type="text/javascript"></script>
+  -->
+  <link rel="stylesheet" type="text/css" href="/theme/css/style.css">
+  <link rel="stylesheet" type="text/css" href="/theme/css/pygments.css">
+  <link rel="stylesheet" type="text/css" href="//fonts.googleapis.com/css?family=PT+Sans|PT+Serif|PT+Mono">
+
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="author" content="Jake Close">
+  <meta name="description" content="Posts and writings by Jake Close">
+
+
+<meta name="keywords" content="D3">
+
+  <title>
+    Jake Close
+&ndash; How Spotify Relates Artist  </title>
+
+</head>
+
+<body>
+  <aside>
+    <div id="user_meta">
+      <a href="">
+        <img src="/theme/images/logo.png" alt="logo">
+      </a>
+      <h2><a href="">Jake Close</a></h2>
+      <p>Passionate about the intersection of business, technology, and design.</p>
+      <ul>
+        <li><a href="/blog/">Blog</a></li>
+        <li><a href="/index.html">About</a></li>
+        <li><a href="/pdfs/Jacob_Close_Resume.pdf" target="_blank">Resume</a></li>
+        <li><a href="https://soundcloud.com/owja" target="_blank">Soundcloud</a></li>
+        <li><a href="https:www.linkedin.com/in/jake-close-999a00b2" target="_blank">LinkedIn</a></li>
+        <li><a href="https://github.com/jsclose" target="_blank">GitHub</a></li>
+      </ul>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <p>
+      <a href="">Index</a> &brvbar; <a href="/archives.html">Archives</a>
+      </p>
+    </header>
+
+<article>
+  <div class="article_title">
+    <h3><a href="/blog/spotify viz.html">How Spotify Relates Artist</a></h3>
+  </div>
+  <div class="article_text">
+    <p>Welcome to the first post of my blog. To begin, I am going to touch on a particular interst of mine, music.</p>
+<p>I have always been passionate about music, playing an instrument when I was younger and making some electronic music now. This project was inspired after I read an article posted on <strong><a href="http://www.decibelsanddecimals.com/">Brady Fowler's music data blog</a></strong> . His work looked to analyze how Spotify classifies music by genre. Hoping to gain experience with python, Spotify API, and d3.js, I set out to create my own project. </p>
+<p>This first obstacle was obtaining the data. I used the <strong><a href="https://developer.spotify.com/web-api/endpoint-reference/">Spotify Endpoint API</a></strong> to obtain information about the particular artist. Using the json and urrlib2 python libraries, I was able to parse the data into a particular Arist class:</p>
+<div class="highlight"><pre><span></span><span class="k">class</span> <span class="n">Artist:</span>   
+    <span class="n">def</span> <span class="n">__init__</span>(<span class="k">self</span>, <span class="n">id</span>):
+        <span class="k">self</span>.<span class="n">id</span> = <span class="n">id</span>
+        <span class="k">self</span>.<span class="nb">name</span> = <span class="s">&#39;&#39;</span>
+        <span class="k">self</span>.<span class="n">followers</span> = <span class="s">&#39;&#39;</span>
+        <span class="k">self</span>.<span class="n">popularity</span> = <span class="s">&#39;&#39;</span>
+        <span class="k">self</span>.<span class="n">related_artists</span> = [ ]
+        <span class="k">self</span>.<span class="n">get_artist</span>()
+        <span class="k">self</span>.<span class="n">get_related_artist</span>()
+
+    <span class="n">def</span> <span class="n">get_artist</span>(<span class="k">self</span>):
+            <span class="n">getArtist</span> =  <span class="s">&quot;https://api.spotify.com/v1/artists/&quot;</span> + <span class="k">self</span>.<span class="n">id</span> + <span class="s">&quot;/&quot;</span>
+            <span class="n">obj</span> = <span class="n">urllib2</span>.<span class="n">urlopen</span>(<span class="n">getArtist</span>)
+            <span class="n">artistInfo</span> = <span class="n">json</span>.<span class="n">load</span>(<span class="n">obj</span>)
+            <span class="k">self</span>.<span class="nb">name</span> = <span class="n">artistInfo</span>[<span class="s">&#39;name&#39;</span>]
+            <span class="k">self</span>.<span class="n">followers</span> = <span class="n">artistInfo</span>[<span class="s">&#39;followers&#39;</span>][<span class="s">&#39;total&#39;</span>]
+            <span class="k">self</span>.<span class="n">popularity</span> = <span class="n">artistInfo</span>[<span class="s">&#39;popularity&#39;</span>]
+
+    <span class="n">def</span> <span class="n">get_related_artist</span>(<span class="k">self</span>):
+        <span class="n">url</span> = <span class="s">&quot;https://api.spotify.com/v1/artists/&quot;</span> + <span class="k">self</span>.<span class="n">id</span> + <span class="s">&quot;/related-artists&quot;</span>
+        <span class="n">json_obj</span> = <span class="n">urllib2</span>.<span class="n">urlopen</span>(<span class="n">url</span>)
+        <span class="n">data</span> = <span class="n">json</span>.<span class="n">load</span>(<span class="n">json_obj</span>)
+        <span class="k">for</span> <span class="n">item</span> <span class="n">in</span> <span class="n">data</span>[<span class="s">&#39;artists&#39;</span>]:
+            <span class="k">self</span>.<span class="n">related_artists</span>.<span class="n">append</span>(<span class="n">str</span>(<span class="n">item</span>[<span class="s">&#39;id&#39;</span>]))
+</pre></div>
+
+
+<p>After I was able to store all of the relevant data in class, I created a function to traverse the list of related artists that were returned, and create a new list of artists. I took advatange of the python package <strong><a href="https://networkx.github.io/documentation/networkx-1.10/overview.html">NetworkX</a></strong> to create a graph representation (with nodes and links):</p>
+<div class="highlight"><pre><span></span>def createGraph(artist, graph):
+        for relatedID in artist.related_artists:
+        #create a new artist
+         related_artist = Artist(relatedID)
+         Z.add_node(related_artist.name, popularity = related_artist.popularity, followers = related_artist.followers)
+         Z.add_edge(artist.name, related_artist.name)
+</pre></div>
+
+
+<p>So, when I went to create a graph for a particular artist, I would first call createGraph, and then go through all of Kanye West related artists and repeated the process:</p>
+<div class="highlight"><pre><span></span>createGraph(kanye, Z)
+for iD in kanye.related_artists:
+    test = Artist(iD)
+    ArtistArray.append(test)
+    createGraph(test, Z)
+</pre></div>
+
+
+<p>It's relatively easy to plot the network graph using matlibplot:</p>
+<div class="highlight"><pre><span></span>nx.draw(Z, with_labels = True)
+plt.show()
+</pre></div>
+
+
+<p>I drew my first graph for Elvis Presley with only one degree of related artists. <img alt="One degree" src="../images/7_31_attempt.png" /></p>
+<p>After implementing the loop that traverses through the related artists and adds another degree, I created one for <img alt="Coldplay" src="../images/coldplay.png" /> and <img alt="Kanye West" src="../images/kanye.png" /></p>
+<p>I was not particularly satisfied by how the visualization looked with the built in graph. Also, I was hoping to gain experience with a D3.js so I worked to create a force-directed graph. I had to export the data as a json file and was then able to read in the json through d3. Pelican has difficulty rendering the graph so I have hosted it on blocks and you can view it <strong><a href="http://bl.ocks.org/jsclose/52dc635f807bb43daa6b2ed5765004fd">Here</a></strong> .  I found this method of visualization much more clear and interesting. Furthermore, there is additionally functionality as you can click on a node and it highlights the surronding neighbors. I am currently working to add more features such as search and click to learn more info so stay posted. Thanks for reading!</p>
+  </div>
+  <div class="article_meta">
+    <p>Posted on: Mon 15 August 2016</p>
+    <p>Category: <a href="/blog/category/blog.html">Blog</a>
+ &ndash; Tags:
+      <a href="/blog/tag/d3.html">D3</a>    </p>
+  </div>
+
+
+</article>
+
+
+    <div id="ending_message">
+      <p>&copy; Jake Close. Built using <a href="http://getpelican.com" target="_blank">Pelican</a>. Theme by Giulio Fidente on <a href="https://github.com/gfidente/pelican-svbhack" target="_blank">github</a>. </p>
+    </div>
+  </main>
+</body>
+</html>
